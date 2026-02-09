@@ -1,0 +1,4 @@
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/ampgefundpreagov/public_html/main
+    - /bin/cp -r * $DEPLOYPATH

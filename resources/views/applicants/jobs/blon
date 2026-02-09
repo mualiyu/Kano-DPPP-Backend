@@ -1,0 +1,79 @@
+
+                    <div class="modal fade" id="modalId{{$j->id}}" tabindex="-1" role="dialog">
+                      <div class="modal-dialog modal-xl" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h4 class="modal-title">{{$j->name}}</h4>
+                            <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <article class="card border-0 bg-default">
+                              <div class="card-body pb-4">
+                                <div class="d-flex align-items-center mb-4 mt-n1">
+                                  <span class="fs-sm text-muted">{{date('M d, Y', strtotime($j->open_date))}} .</span>
+                                  <span class="fs-sm text-muted"> To  {{date('M d, Y', strtotime($j->close_date))}}</span>
+                                  <span class="fs-xs opacity-20 mx-3">|</span>
+                                  <a href="#" class="badge text-nav fs-xs border">{{$j->status}}</a>
+                                </div>
+                                {{-- @foreach ($j->business_sub_categories as $bsc)
+                                <div>
+                                      <p>{{$bsc->name}}</p>
+                                </div>
+                                @endforeach --}}
+                                @if ($j->job_contents)
+                                    @foreach ($j->job_contents as $jc)
+                                    <h3 class="h4 card-title" style="font-size: 20px;">
+                                      <a href="#">{{$jc->heading}}</a>
+                                    </h3>
+                                    <p class="card-text" style="font-size: 15px;">{{$jc->content}}</p>
+                                    @endforeach
+                                    @endif
+                                </div>
+                                <div class="table-responsive w-50 mx-4">
+                                  <table class="table">
+                                    <thead>
+                                      <tr>
+                                        <th>#</th>
+                                        <th>MileStone</th>
+                                        <th>Due Date</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      @if ($j->job_contents)
+                                        @foreach ($j->job_milestones as $jm)
+                                      <tr>
+                                        <th scope="row">1</th>
+                                        <td class="border-0 py-1 px-0">
+                                          <div class="d-flex align-items-center">
+                                            <div class="ps-3 ps-sm-4">
+                                              <h4 class="h6 mb-2"><a href="shop-single.html">{{$jm->heading}}</a></h4>
+                                              <div class="text-muted fs-sm me-3"><p class="text-dark fw-medium">{{$jm->content}}</p></div>
+                                            </div>
+                                          </div>
+                                        </td>
+                                        <td>{{date('M d, Y', strtotime($jm->due_date))}}</td>
+                                      </tr>
+                                       @endforeach
+                                    @endif
+                                    </tbody>
+                                  </table>
+                                </div>
+                                @if ($j->job_docs)
+                                <div class="mx-4">
+                                    <div class="d-none d-sm-block fs-sm mb-2">Document Required</div>
+                                    <ul class="list-group list-group-horizontal-sm">
+                                        @foreach ($j->job_docs as $jdoc)
+                                        <li class="list-group-item">{{$jdoc->name}}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                                @endif
+                            </article>
+                          </div>
+                          <div class="modal-footer">
+                            <button class="btn btn-secondary w-100 w-sm-auto mb-3 mb-sm-0" type="button" data-bs-dismiss="modal">Close</button>
+                            <a class="btn btn-primary w-100 w-sm-auto ms-sm-3" href="{{route('show_apply_job', ['id'=>$j->id])}}" type="button">Apply</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
