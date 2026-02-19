@@ -52,7 +52,7 @@
           </div>
         </div>
         <!-- Cover image-->
-        <div class="w-50 bg-size-cover bg-repeat-0 bg-position-center" style="background-image: url({{asset('assets/img/account/cover.jpg')}});"></div>
+        <div class="w-50 bg-size-cover bg-repeat-0 bg-position-center" style="background-image: url({{asset('assets/img/images/kano-admin-cover.png')}});"></div>
       </div>
     </main>
 @endsection
