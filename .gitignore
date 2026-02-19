@@ -17,3 +17,7 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# Laravel cache files
+/bootstrap/cache/*.php
+!bootstrap/cache/.gitignore
