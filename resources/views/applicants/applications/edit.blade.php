@@ -30,7 +30,7 @@
                         @csrf
                         <div class="row">
                           <?php $d=0; ?>
-
+                              @php $currentReqBySys = $app->app_requirements->keyBy('sys_id'); @endphp
                               @foreach ($app->job->job_requirements as $jr)
                               <div class="col-sm-12">
                                   <div class="mb-3">
@@ -38,7 +38,7 @@
                                     @if ($jr->sys_requirement->type == "TextInput")
                                     <input class="form-control" name="app_r_value[{{$jr->sys_id}}]" type="text" value="">
                                     @elseif($jr->sys_requirement->type == "NumericInput")
-                                    <input class="form-control" name="app_r_value[{{$jr->sys_id}}]" type="number" value="">
+                                    <input class="form-control js-currency-input" name="app_r_value[{{$jr->sys_id}}]" type="text" value="" placeholder="0" data-decimals="2" inputmode="decimal">
                                     @elseif($jr->sys_requirement->type == "CheckBox")
                                     <input name="app_r_value[{{$jr->sys_id}}]" type="checkbox">
                                     @elseif($jr->sys_requirement->type == "Yes/No")
@@ -50,6 +50,42 @@
                                     <input name="app_r_value[{{$jr->sys_id}}]" value="0" type="radio" >
                                     @elseif($jr->sys_requirement->type == "Textarea")
                                     <textarea class="form-control" name="app_r_value[{{$jr->sys_id}}]" rows="10"></textarea>
+                                    @elseif($jr->sys_requirement->type == "FileUpload")
+                                    @php $curFile = $currentReqBySys->get($jr->sys_id); @endphp
+                                    @if($curFile && !empty($curFile->value))
+                                    <p class="mb-1">Current file: <span class="text-muted">{{ $curFile->value }}</span></p>
+                                    @if(Route::has('app_view_requirement_file') || Route::has('app_download_requirement_file'))
+                                    <span class="d-inline-flex gap-1 mb-2">
+                                        @if(Route::has('app_view_requirement_file'))<a href="{{ route('app_view_requirement_file', ['filename' => $curFile->value]) }}" target="_blank" class="btn btn-sm btn-outline-secondary">View</a>@endif
+                                        @if(Route::has('app_download_requirement_file'))<a href="{{ route('app_download_requirement_file', ['filename' => $curFile->value]) }}" class="btn btn-sm btn-outline-primary">Download</a>@endif
+                                    </span>
+                                    @endif
+                                    @endif
+                                    <input class="form-control" name="app_r_file[{{$jr->sys_id}}]" type="file" accept=".pdf">
+                                    <small class="text-muted">PDF only. Leave empty to keep existing file.</small>
+                                    @elseif($jr->sys_requirement->type == "YesNoWithEvidence")
+                                    @php
+                                        $curYn = $currentReqBySys->get($jr->sys_id);
+                                        $ynVal = $curYn ? $curYn->value : null;
+                                        $isYes = $ynVal == 1 || $ynVal === '1' || (is_string($ynVal) && strpos($ynVal, '1') === 0);
+                                        $evidenceFile = (is_string($ynVal) && strpos($ynVal, '|') !== false) ? (explode('|', $ynVal)[1] ?? null) : null;
+                                    @endphp
+                                    <br>
+                                    <label class="me-3">Yes:</label>
+                                    <input name="app_r_value[{{$jr->sys_id}}]" value="1" type="radio" class="app-r-yn-radio me-1" data-sysid="{{$jr->sys_id}}">
+                                    <label class="me-3">No:</label>
+                                    <input name="app_r_value[{{$jr->sys_id}}]" value="0" type="radio" class="app-r-yn-radio me-1" data-sysid="{{$jr->sys_id}}" checked>
+                                    @if($evidenceFile)
+                                    <p class="mb-1 mt-1">Current evidence: <span class="text-muted">{{ $evidenceFile }}</span></p>
+                                    @if(Route::has('app_view_requirement_file') || Route::has('app_download_requirement_file'))
+                                    <span class="d-inline-flex gap-1 mb-2">@if(Route::has('app_view_requirement_file'))<a href="{{ route('app_view_requirement_file', ['filename' => $evidenceFile]) }}" target="_blank" class="btn btn-sm btn-outline-secondary">View</a>@endif @if(Route::has('app_download_requirement_file'))<a href="{{ route('app_download_requirement_file', ['filename' => $evidenceFile]) }}" class="btn btn-sm btn-outline-primary">Download</a>@endif</span>
+                                    @endif
+                                    @endif
+                                    <div class="mt-2 app-r-evidence-wrap" id="evidence-wrap-{{$jr->sys_id}}" style="display:none;">
+                                        <label class="form-label mb-1">Evidence (if Yes)</label>
+                                        <input class="form-control" name="app_r_evidence_file[{{$jr->sys_id}}]" type="file" accept=".pdf">
+                                        <small class="text-muted">PDF only</small>
+                                    </div>
                                     @endif
                                     <input type="hidden" name="app_r_name[{{$jr->sys_id}}]" value="{{$jr->sys_requirement->name}}">
                                     <input type="hidden" name="app_r_type[{{$jr->sys_id}}]" value="{{$jr->sys_requirement->type}}">
@@ -57,8 +93,6 @@
                               </div>
                               @endforeach
 
-                              <h6 class="pt-5">Documents</h6>
-                              <div class="d-none d-sm-block fs-sm mb-2 ">Note: <small>(All doc's most be converted to pdf).</small></div>
                               <input type="hidden" name="job" value="{{$app->job->id}}">
                               @if (count($app->job->job_docs)>0)
                                   @foreach ($app->job->job_docs as $jdoc)
@@ -137,6 +171,15 @@
 
 @section('script')
 <script>
+    // Yes/No with Evidence: show evidence file when Yes is selected
+    document.querySelectorAll('.app-r-yn-radio').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            var sysId = this.getAttribute('data-sysid');
+            var wrap = document.getElementById('evidence-wrap-' + sysId);
+            if (wrap) wrap.style.display = this.value === '1' ? 'block' : 'none';
+        });
+    });
+
 // Create a break line element
     var br = document.createElement("br");
     var c = <?php echo $r;?>;

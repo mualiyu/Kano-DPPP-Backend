@@ -31,6 +31,20 @@ class JobController extends Controller
     }
 
     /**
+     * Parse amount from request (strip thousand separators for storage).
+     *
+     * @param  mixed  $value
+     * @return string|null
+     */
+    private function parseAmount($value)
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        return str_replace(',', '', (string) $value) ?: null;
+    }
+
+    /**
      * Generate a unique tender number
      *
      * @return string
@@ -173,7 +187,7 @@ class JobController extends Controller
             'mda_id' => $request->mda_id,
             'name'=> $request->name,
             'description' => $request->description,
-            'estimated_value' => $request->estimated_value,
+            'estimated_value' => $this->parseAmount($request->estimated_value),
             'currency' => $request->currency ?? 'NGN',
             'tender_type' => $request->tender_type,
             'status'=> $request->j_status,
@@ -181,9 +195,9 @@ class JobController extends Controller
             'closing_date' => $request->closing_date ?? $request->close_date,
             'evaluation_start_date' => $request->evaluation_start_date,
             'evaluation_end_date' => $request->evaluation_end_date,
-            'bid_security_amount' => $request->bid_security_amount,
-            'performance_security_amount' => $request->performance_security_amount,
-            'contract_duration_days' => $request->contract_duration_days,
+            'bid_security_amount' => $this->parseAmount($request->bid_security_amount),
+            'performance_security_amount' => $this->parseAmount($request->performance_security_amount),
+            'contract_duration_days' => $this->parseAmount($request->contract_duration_days),
             'special_conditions' => $request->special_conditions,
             'created_by' => auth()->id(),
             // Legacy fields for backward compatibility
@@ -388,17 +402,17 @@ class JobController extends Controller
             'description' => $request->description,
             'requisition_id' => $request->requisition_id,
             'mda_id' => $request->mda_id,
-            'estimated_value' => $request->estimated_value,
+            'estimated_value' => $this->parseAmount($request->estimated_value),
             'currency' => $request->currency,
             'tender_type' => $request->tender_type,
             'status'=> $request->status,
-            'opening_date' => $request->opening_date,
-            'closing_date' => $request->closing_date,
+            'opening_date' => $request->opening_date ?? $request->open_date,
+            'closing_date' => $request->closing_date ?? $request->close_date,
             'evaluation_start_date' => $request->evaluation_start_date,
             'evaluation_end_date' => $request->evaluation_end_date,
-            'bid_security_amount' => $request->bid_security_amount,
-            'performance_security_amount' => $request->performance_security_amount,
-            'contract_duration_days' => $request->contract_duration_days,
+            'bid_security_amount' => $this->parseAmount($request->bid_security_amount),
+            'performance_security_amount' => $this->parseAmount($request->performance_security_amount),
+            'contract_duration_days' => $this->parseAmount($request->contract_duration_days),
             'special_conditions' => $request->special_conditions,
             // Legacy fields for backward compatibility
             'open_date'=>$request->open_date,

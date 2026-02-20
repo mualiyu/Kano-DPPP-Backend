@@ -135,6 +135,8 @@ Route::prefix('/admin')->group(function () {
     // Applications routes (now using BidController)
     Route::prefix('/applications')->group(function () {
         Route::get('', [App\Http\Controllers\BidController::class, 'index'])->name('applications');
+        Route::get('view-requirement-file/{filename}', [App\Http\Controllers\BidController::class, 'view_requirement_file'])->name('admin_view_requirement_file')->where('filename', '.+');
+        Route::get('requirement-file/{filename}', [App\Http\Controllers\BidController::class, 'download_requirement_file'])->name('admin_download_requirement_file')->where('filename', '.+');
         Route::get('/{id}/job', [App\Http\Controllers\BidController::class, 'job_apps'])->name('job_applications');
         Route::get('/{id}/job/export', [App\Http\Controllers\BidController::class, 'export_job_apps'])->name('job_export_applications');
         Route::get('/{id}/download', [App\Http\Controllers\BidController::class, 'download_doc'])->name('download_doc');
@@ -183,11 +185,13 @@ Route::prefix('/applicant')->group(function () {
     Route::post('/profile/{id}/change-password', [App\Http\Controllers\Applicant\ProfileController::class, 'update_password'])->name('app_change_pass');
     Route::post('/profile/delete-picture/{id}', [App\Http\Controllers\Applicant\ProfileController::class, 'delete_pic'])->name('app_delete_profile_pic');
 
-    // Applications routes
+    // Applications routes (specific routes first so they are not caught by {id})
     Route::prefix('/applications')->group(function () {
          Route::get('', [App\Http\Controllers\Applicant\ApplicationController::class, 'index'])->name('app_applications');
-         Route::get('/{id}/download', [App\Http\Controllers\Applicant\ApplicationController::class, 'download_doc'])->name('app_download_doc');
-         Route::get('/{id}/info', [App\Http\Controllers\Applicant\ApplicationController::class, 'show'])->name('app_application_info');
+         Route::get('view-requirement-file/{filename}', [App\Http\Controllers\Applicant\ApplicationController::class, 'view_requirement_file'])->name('app_view_requirement_file')->where('filename', '.+');
+         Route::get('requirement-file/{filename}', [App\Http\Controllers\Applicant\ApplicationController::class, 'download_requirement_file'])->name('app_download_requirement_file')->where('filename', '.+');
+         Route::get('{id}/download', [App\Http\Controllers\Applicant\ApplicationController::class, 'download_doc'])->name('app_download_doc')->where('id', '[0-9]+');
+         Route::get('{id}/info', [App\Http\Controllers\Applicant\ApplicationController::class, 'show'])->name('app_application_info')->where('id', '[0-9]+');
     });
 
 });

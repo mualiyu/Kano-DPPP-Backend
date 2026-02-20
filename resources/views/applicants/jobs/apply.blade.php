@@ -34,36 +34,52 @@
                               @foreach ($job->job_requirements as $jr)
                               <div class="col-sm-12">
                                   <div class="mb-3">
-                                    <label for="file-input" class="form-label">{{$jr->sys_requirement->name}}: </label>
+                                    <label for="file-input" class="form-label">{{$jr->sys_requirement->name}}: <span class="text-danger">*</span></label>
                                     @if ($jr->sys_requirement->type == "TextInput")
-                                    <input class="form-control" name="app_r_value[{{$jr->sys_id}}]" type="text" value="">
+                                    <input class="form-control" name="app_r_value[{{$jr->sys_id}}]" type="text" value="" required>
                                     @elseif($jr->sys_requirement->type == "NumericInput")
-                                    <input class="form-control" name="app_r_value[{{$jr->sys_id}}]" type="number" value="">
+                                    <input class="form-control js-currency-input" name="app_r_value[{{$jr->sys_id}}]" type="text" value="" placeholder="0" data-decimals="2" inputmode="decimal" required>
                                     @elseif($jr->sys_requirement->type == "CheckBox")
                                     <input name="app_r_value[{{$jr->sys_id}}]" type="checkbox">
                                     @elseif($jr->sys_requirement->type == "Yes/No")
                                     <br>
                                     <label for="y">Yes: </label>
-                                    <input name="app_r_value[{{$jr->sys_id}}]" value="1"  type="radio">
+                                    <input name="app_r_value[{{$jr->sys_id}}]" value="1" type="radio" required>
                                     <br>
                                     <label for="n">No: </label>
-                                    <input name="app_r_value[{{$jr->sys_id}}]" value="0" type="radio" >
+                                    <input name="app_r_value[{{$jr->sys_id}}]" value="0" type="radio">
                                     {{-- <input name="app_r_value[{{$jr->sys_id}}]" type="checkbox"> --}}
                                     @elseif($jr->sys_requirement->type == "Textarea")
-                                    <textarea class="form-control" name="app_r_value[{{$jr->sys_id}}]" rows="10"></textarea>
+                                    <textarea class="form-control" name="app_r_value[{{$jr->sys_id}}]" rows="10" required></textarea>
+                                    @elseif($jr->sys_requirement->type == "FileUpload")
+                                    <input class="form-control" name="app_r_file[{{$jr->sys_id}}]" type="file" accept=".pdf" required>
+                                    <small class="text-muted">PDF only</small>
+                                    @elseif($jr->sys_requirement->type == "YesNoWithEvidence")
+                                    <br>
+                                    <label class="me-3">Yes:</label>
+                                    <input name="app_r_value[{{$jr->sys_id}}]" value="1" type="radio" class="app-r-yn-radio me-1" data-sysid="{{$jr->sys_id}}" required>
+                                    <label class="me-3">No:</label>
+                                    <input name="app_r_value[{{$jr->sys_id}}]" value="0" type="radio" class="app-r-yn-radio me-1" data-sysid="{{$jr->sys_id}}" checked>
+                                    <div class="mt-2 app-r-evidence-wrap" id="evidence-wrap-{{$jr->sys_id}}" style="display:none;">
+                                        <label class="form-label mb-1">Evidence (if Yes)</label>
+                                        <input class="form-control" name="app_r_evidence_file[{{$jr->sys_id}}]" type="file" accept=".pdf">
+                                        <small class="text-muted">PDF only</small>
+                                    </div>
                                     @endif
                                     <input type="hidden" name="app_r_name[{{$jr->sys_id}}]" value="{{$jr->sys_requirement->name}}">
                                     <input type="hidden" name="app_r_type[{{$jr->sys_id}}]" value="{{$jr->sys_requirement->type}}">
                                   </div>
                               </div>
                               @endforeach
+                              <div class="d-none">
                               <h6 class="pt-5">Documents</h6>
                               <div class="d-none d-sm-block fs-sm mb-2 ">Note: <small>(All doc's most be converted to pdf).</small></div>
+                              </div>
                               <input type="hidden" name="job" value="{{$job->id}}">
                               @if (count($job->job_docs)>0)
                               @foreach ($job->job_docs as $jdoc)
                               <?php $d++;?>
-                              <div class="col-sm-6">
+                              <div class="col-sm-6 d-none">
                                 <div class="mb-3">
                                   <label for="file-input" class="form-label">{{$jdoc->name}}: </label>
                                   <input class="form-control" name="doc{{$d}}" type="file" id="file-input">
@@ -129,6 +145,15 @@
 
 @section('script')
 <script>
+    // Yes/No with Evidence: show evidence file when Yes is selected
+    document.querySelectorAll('.app-r-yn-radio').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            var sysId = this.getAttribute('data-sysid');
+            var wrap = document.getElementById('evidence-wrap-' + sysId);
+            if (wrap) wrap.style.display = this.value === '1' ? 'block' : 'none';
+        });
+    });
+
     // $('#datepicker').datepicker({
     //     uiLibrary: 'bootstrap3'
     // });

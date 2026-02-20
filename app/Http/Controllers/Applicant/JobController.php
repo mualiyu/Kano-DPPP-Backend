@@ -27,6 +27,35 @@ class JobController extends Controller
     }
 
     /**
+     * Get requirement value from request array; tries both string and int key to avoid form key type mismatch.
+     */
+    private function getRequirementValue(array $arr, $key, $default = null)
+    {
+        if (array_key_exists($key, $arr)) {
+            return $arr[$key];
+        }
+        $intKey = is_numeric($key) ? (int) $key : $key;
+        if (array_key_exists($intKey, $arr)) {
+            return $arr[$intKey];
+        }
+        return $default;
+    }
+
+    /**
+     * Generate a unique bid number
+     *
+     * @return string
+     */
+    private function generateBidNumber()
+    {
+        do {
+            $bidNumber = 'BID-' . date('Ymd') . '-' . str_pad(mt_rand(1, 999999), 6, '0', STR_PAD_LEFT);
+        } while (Bid::where('bid_number', $bidNumber)->exists());
+
+        return $bidNumber;
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -96,7 +125,7 @@ class JobController extends Controller
     {
         $applicant = session('Applicant');
 
-        $bid = Bid::where(['tender_id'=> $id, 'vendor_id'=>$applicant->id])->get();
+        $bid = Bid::with('app_requirements')->where(['tender_id'=> $id, 'vendor_id'=>$applicant->id])->get();
 
         if (count($bid)>0) {
             $app = $bid[0];
@@ -163,9 +192,10 @@ class JobController extends Controller
         }
 
         $bid = Bid::create([
-            "vendor_id" => $applicant->id,
-            "tender_id"=> $job->id,
-            "status"=> "Submitted",
+            'bid_number' => $this->generateBidNumber(),
+            'vendor_id'  => $applicant->id,
+            'tender_id'  => $job->id,
+            'status'     => 'Submitted',
         ]);
 
         if (!$bid) {
@@ -201,17 +231,49 @@ class JobController extends Controller
         // Dynamic application requirements
         if (!empty($request->app_r_name)) {
             foreach ($request->app_r_name as $key => $arn) {
-                if (!empty($request->app_r_value)) {
-                    $arv = array_key_exists($key,$request->app_r_value) ? $request->app_r_value[$key]:null;
-                    AppRequirement::create([
-                        'name'      => $arn,
-                        'value'     => $arv,
-                        'type'      => $request->app_r_type[$key],
-                        'tender_id' => $job->id,
-                        'sys_id'    => $key,
-                        'app_id'    => $bid->id,
-                    ]);
+                $type = $request->app_r_type[$key] ?? null;
+                $arv = null;
+
+                if ($type === 'FileUpload') {
+                    if ($request->hasFile('app_r_file') && isset($request->file('app_r_file')[$key])) {
+                        $file = $request->file('app_r_file')[$key];
+                        if ($file->getClientOriginalExtension() !== 'pdf') {
+                            $bid->delete();
+                            return back()->with('error', 'Application requirement "' . $arn . '" must be a PDF.');
+                        }
+                        $fileNameToStore = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '_' . time() . '.pdf';
+                        $file->storeAs('public/document', $fileNameToStore);
+                        $arv = $fileNameToStore;
+                    }
+                } elseif ($type === 'YesNoWithEvidence') {
+                    $yn = $this->getRequirementValue($request->app_r_value ?? [], $key, '0');
+                    if ($yn === '1' && $request->hasFile('app_r_evidence_file') && isset($request->file('app_r_evidence_file')[$key])) {
+                        $file = $request->file('app_r_evidence_file')[$key];
+                        if ($file->getClientOriginalExtension() !== 'pdf') {
+                            $bid->delete();
+                            return back()->with('error', 'Evidence for "' . $arn . '" must be a PDF.');
+                        }
+                        $fileNameToStore = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '_evidence_' . time() . '.pdf';
+                        $file->storeAs('public/document', $fileNameToStore);
+                        $arv = '1|' . $fileNameToStore;
+                    } else {
+                        $arv = $yn;
+                    }
+                } else {
+                    $arv = $this->getRequirementValue($request->app_r_value ?? [], $key, null);
+                    if ($type === 'NumericInput' && $arv !== null && $arv !== '') {
+                        $arv = preg_replace('/[\s,]/', '', $arv);
+                    }
                 }
+
+                AppRequirement::create([
+                    'name'      => $arn,
+                    'value'     => $arv,
+                    'type'      => $type,
+                    'tender_id' => $job->id,
+                    'sys_id'    => $key,
+                    'app_id'    => $bid->id,
+                ]);
             }
         }
 
@@ -336,11 +398,10 @@ class JobController extends Controller
             $bid = Bid::find($bidModel->id);
 
             if ($bid) {
-                if (count($bid->application_documents)>0) {
-                    foreach ($bid->application_documents as $bid_doc) {
-                        BidDocument::where('id', '=', $bid_doc->id)->delete();
-                    }
-                }
+                // Keep existing app requirements to preserve values when user doesn't upload / submit new data
+                $existingReqs = $bid->app_requirements->keyBy(function ($r) {
+                    return (string) $r->sys_id;
+                });
 
                 if (count($bid->app_requirements)>0) {
                     foreach ($bid->app_requirements as $bid_r) {
@@ -359,7 +420,7 @@ class JobController extends Controller
                 }
 
                 if ($updated) {
-                    // Handle supporting documents
+                    // Handle supporting documents: only replace when user uploads a new file; otherwise keep previous
                     if ((int) $request->num > 0 && !empty($request->doc_id)) {
                         foreach ($request->doc_id as $key => $doc_id) {
                             $doc = "doc".$key;
@@ -371,6 +432,9 @@ class JobController extends Controller
                                 if ($fileExt !== "pdf") {
                                     return back()->with('error', "File is not PDF");
                                 }
+
+                                // Remove existing document for this job_doc slot so we replace with new one
+                                BidDocument::where('application_id', $bid->id)->where('job_doc_id', $doc_id)->delete();
 
                                 $fileNameToStore = $fileName . "_" . time() . "." . $fileExt;
                                 $request->file($doc)->storeAs("public/document", $fileNameToStore);
@@ -384,14 +448,56 @@ class JobController extends Controller
                         }
                     }
 
-                    // Dynamic application requirements
+                    // Dynamic application requirements: keep previous value when user didn't upload / submit new data
                     if (!empty($request->app_r_name)) {
                         foreach ($request->app_r_name as $key => $arn) {
-                            $arv = array_key_exists($key,$request->app_r_value) ? $request->app_r_value[$key]:null;
+                            $type = $request->app_r_type[$key] ?? null;
+                            $existing = $existingReqs->get($key);
+                            $arv = null;
+
+                            if ($type === 'FileUpload') {
+                                if ($request->hasFile('app_r_file') && isset($request->file('app_r_file')[$key])) {
+                                    $file = $request->file('app_r_file')[$key];
+                                    if ($file->getClientOriginalExtension() !== 'pdf') {
+                                        return back()->with('error', 'Application requirement "' . $arn . '" must be a PDF.');
+                                    }
+                                    $fileNameToStore = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '_' . time() . '.pdf';
+                                    $file->storeAs('public/document', $fileNameToStore);
+                                    $arv = $fileNameToStore;
+                                } else {
+                                    $arv = $existing ? $existing->value : null;
+                                }
+                            } elseif ($type === 'YesNoWithEvidence') {
+                                $yn = $this->getRequirementValue($request->app_r_value ?? [], $key, '0');
+                                if ($yn === '1' && $request->hasFile('app_r_evidence_file') && isset($request->file('app_r_evidence_file')[$key])) {
+                                    $file = $request->file('app_r_evidence_file')[$key];
+                                    if ($file->getClientOriginalExtension() !== 'pdf') {
+                                        return back()->with('error', 'Evidence for "' . $arn . '" must be a PDF.');
+                                    }
+                                    $fileNameToStore = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '_evidence_' . time() . '.pdf';
+                                    $file->storeAs('public/document', $fileNameToStore);
+                                    $arv = '1|' . $fileNameToStore;
+                                } else {
+                                    if ($yn === '1' && $existing && is_string($existing->value) && strpos($existing->value, '|') !== false) {
+                                        $arv = $existing->value;
+                                    } else {
+                                        $arv = $yn;
+                                    }
+                                }
+                            } else {
+                                $arv = $this->getRequirementValue($request->app_r_value ?? [], $key, null);
+                                if ($type === 'NumericInput' && $arv !== null && $arv !== '') {
+                                    $arv = preg_replace('/[\s,]/', '', $arv);
+                                }
+                                if (($arv === null || $arv === '') && $existing) {
+                                    $arv = $existing->value;
+                                }
+                            }
+
                             AppRequirement::create([
                                 'name'      => $arn,
                                 'value'     => $arv,
-                                'type'      => $request->app_r_type[$key],
+                                'type'      => $type,
                                 'tender_id' => $job->id,
                                 'sys_id'    => $key,
                                 'app_id'    => $bid->id,

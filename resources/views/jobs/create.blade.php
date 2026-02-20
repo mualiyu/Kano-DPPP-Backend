@@ -49,7 +49,7 @@
                     <div class="col-sm-6">
                       <label class="form-label" for="estimated_value">Estimated Value</label>
                       <div class="input-group">
-                        <input class="form-control" type="number" name="estimated_value" id="estimated_value" step="0.01" min="0" placeholder="0.00">
+                        <input class="form-control js-currency-input" type="text" name="estimated_value" id="estimated_value" placeholder="0.00" data-decimals="2" inputmode="decimal">
                         <select class="form-control" name="currency" id="currency" style="max-width: 80px;">
                             <option value="NGN" selected>NGN</option>
                             <option value="USD">USD</option>
@@ -113,17 +113,8 @@
                       <input class="form-control" type="date" value="" id="close_date" name="close_date" required>
                     </div>
                     <div class="col-sm-6">
-                      <label class="form-label" for="close_date">Terms of reference (ToR)</label>
-                      <input class="form-control" type="file" id="close_date" name="tor">
-                    </div>
-
-                    <div class="col-sm-6">
-                      <label class="form-label" for="opening_date">Opening Date</label>
-                      <input class="form-control" type="date" value="" id="opening_date" name="opening_date">
-                    </div>
-                    <div class="col-sm-6">
-                      <label class="form-label" for="closing_date">Closing Date</label>
-                      <input class="form-control" type="date" value="" id="closing_date" name="closing_date">
+                      <label class="form-label" for="tor">Terms of reference (ToR)</label>
+                      <input class="form-control" type="file" id="tor" name="tor">
                     </div>
 
                     <div class="col-sm-6">
@@ -137,17 +128,17 @@
 
                     <div class="col-sm-6">
                       <label class="form-label" for="bid_security_amount">Bid Security Amount</label>
-                      <input class="form-control" type="number" name="bid_security_amount" id="bid_security_amount" step="0.01" min="0" placeholder="0.00">
+                      <input class="form-control js-currency-input" type="text" name="bid_security_amount" id="bid_security_amount" placeholder="0.00" data-decimals="2" inputmode="decimal">
                     </div>
 
                     <div class="col-sm-6">
                       <label class="form-label" for="performance_security_amount">Performance Security Amount</label>
-                      <input class="form-control" type="number" name="performance_security_amount" id="performance_security_amount" step="0.01" min="0" placeholder="0.00">
+                      <input class="form-control js-currency-input" type="text" name="performance_security_amount" id="performance_security_amount" placeholder="0.00" data-decimals="2" inputmode="decimal">
                     </div>
 
                     <div class="col-sm-6">
                       <label class="form-label" for="contract_duration_days">Contract Duration (Days)</label>
-                      <input class="form-control" type="number" name="contract_duration_days" id="contract_duration_days" min="0" placeholder="0">
+                      <input class="form-control js-currency-input" type="text" name="contract_duration_days" id="contract_duration_days" placeholder="0" data-decimals="0" inputmode="numeric">
                     </div>
 
                     <div class="col-sm-12">
@@ -200,14 +191,6 @@
 
              </div>
              <hr>
-              <br>
-                    <div class="col-12 mb-3">
-                      <h6 class="mb-0" >Require Previous Experience: <input  type="checkbox" name="p_e_r" value="1" /></h6>
-                    </div>
-                    <div class="col-12 mb-3">
-                      <h6 class="mb-0" >Require Educational Background: <input  type="checkbox" name="e_b" value="1" /></h6>
-                    </div>
-             <hr>
                     <div class="col-12 mb-3">
                       <h6 class="mb-0" >Application Requirement</h6>
                     </div>
@@ -226,13 +209,12 @@
                     </div>
              <hr>
 
-             <div class="col-12 mb-5 pt-5">
-
+             <div class="col-12 mb-5 pt-5 d-none">
                  <h6 class="mb-0" style="float: left">Documents</h6>
                  <span class="btn btn-primary" style="float: right;" onclick="doctt()">Add</span>
              </div>
 
-             <div class="row docc mb-5">
+             <div class="row docc mb-5 d-none">
              </div>
 
                     <div class="col-12 d-flex justify-content-end pt-3 end">

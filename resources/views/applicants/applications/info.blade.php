@@ -143,13 +143,13 @@
                               <div class="mb-3">
                                 <label for="file-input" class="form-label">{{$ar->name}}: </label>
                                 @if ($ar->type == "TextInput")
-                                <input class="form-control" disabled type="text" value="{{$ar->value}}">
+                                <input class="form-control" disabled type="text" value="{{ $ar->value ?? '' }}">
                                 @elseif($ar->type == "NumericInput")
-                                <input disabled class="form-control"  type="number" value="{{$ar->value}}">
+                                <input disabled class="form-control" type="text" value="{{ $ar->value !== null && $ar->value !== '' && is_numeric($ar->value) ? number_format((float)$ar->value, 2) : ($ar->value ?? '') }}">
                                 @elseif($ar->type == "CheckBox")
-                                <input disabled {{$ar->value == null ? "":"checked"}} type="checkbox">
-                                 @elseif($ar->type == "Yes/No")
-                                  @if ($ar->value == 1)
+                                <input disabled {{ ($ar->value != null && $ar->value != '') ? "checked" : "" }} type="checkbox">
+                                @elseif($ar->type == "Yes/No")
+                                  @if ($ar->value == 1 || $ar->value === '1')
                                   <br>
                                     <label for="y">Yes: </label>
                                     <input disabled checked type="radio">
@@ -165,7 +165,32 @@
                                     <input disabled checked type="radio">
                                   @endif
                                 @elseif($ar->type == "Textarea")
-                                <textarea class="form-control"  rows="10" disabled>{{$ar->value}}</textarea>
+                                <textarea class="form-control" rows="10" disabled>{{ $ar->value ?? '' }}</textarea>
+                                @elseif($ar->type == "FileUpload")
+                                @if(!empty($ar->value))
+                                <p class="mb-0">{{ $ar->value }}</p>
+                                @if(Route::has('app_view_requirement_file') || Route::has('app_download_requirement_file'))
+                                    <span class="mt-1 d-inline-flex gap-1">
+                                        @if(Route::has('app_view_requirement_file'))<a href="{{ route('app_view_requirement_file', ['filename' => $ar->value]) }}" target="_blank" class="btn btn-sm btn-outline-secondary">View</a>@endif
+                                        @if(Route::has('app_download_requirement_file'))<a href="{{ route('app_download_requirement_file', ['filename' => $ar->value]) }}" class="btn btn-sm btn-outline-primary">Download</a>@endif
+                                    </span>
+                                    @endif
+                                @else
+                                <p class="mb-0 text-muted">—</p>
+                                @endif
+                                @elseif($ar->type == "YesNoWithEvidence")
+                                @php
+                                    $ynValue = $ar->value;
+                                    $isYes = ($ynValue == 1 || $ynValue === '1' || (is_string($ynValue) && strpos($ynValue, '1') === 0));
+                                    $evidenceFile = (is_string($ynValue) && strpos($ynValue, '|') !== false) ? explode('|', $ynValue)[1] ?? null : null;
+                                @endphp
+                                @if($isYes)
+                                <span class="me-2">Yes</span> @if($evidenceFile)<span class="text-muted">{{ $evidenceFile }}</span>@if(Route::has('app_view_requirement_file') || Route::has('app_download_requirement_file'))<span class="ms-1 d-inline-flex gap-1">@if(Route::has('app_view_requirement_file'))<a href="{{ route('app_view_requirement_file', ['filename' => $evidenceFile]) }}" target="_blank" class="btn btn-sm btn-outline-secondary">View</a>@endif @if(Route::has('app_download_requirement_file'))<a href="{{ route('app_download_requirement_file', ['filename' => $evidenceFile]) }}" class="btn btn-sm btn-outline-primary">Download</a>@endif</span>@endif @endif
+                                @else
+                                <span>No</span>
+                                @endif
+                                @else
+                                <input class="form-control" disabled type="text" value="{{ $ar->value ?? '—' }}">
                                 @endif
                               </div>
                           </div>

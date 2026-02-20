@@ -8,6 +8,7 @@ use App\Mail\AcceptBidMail;
 use App\Models\Bid;
 use App\Models\BidDocument;
 use App\Models\Comment;
+use App\Models\Job;
 use App\Models\Tender;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -40,7 +41,9 @@ class BidController extends Controller
 
     public function job_apps($id)
     {
-        $applications = Bid::where('tender_id', '=', $id)->paginate(5);
+        $applications = Bid::with(['applicant', 'job', 'app_requirements', 'application_documents', 'experiences', 'educations'])
+            ->where('tender_id', '=', $id)
+            ->paginate(5);
 
         if (count($applications)>0) {
             $job = Job::find($id);
@@ -78,6 +81,43 @@ class BidController extends Controller
         }
     }
 
+    /**
+     * Download a requirement file (admin).
+     */
+    public function download_requirement_file($filename)
+    {
+        $filename = basename(urldecode($filename));
+        if ($filename === '' || strpos($filename, '..') !== false) {
+            abort(404);
+        }
+        $path = public_path('documents/' . $filename);
+        if (! file_exists($path) || ! is_file($path)) {
+            $path = Storage::disk('local')->path('public/document/' . $filename);
+        }
+        if (! file_exists($path) || ! is_file($path)) {
+            abort(404);
+        }
+        return response()->download($path, $filename, ['Content-Type' => 'application/pdf']);
+    }
+
+    /**
+     * View a requirement file in browser (admin).
+     */
+    public function view_requirement_file($filename)
+    {
+        $filename = basename(urldecode($filename));
+        if ($filename === '' || strpos($filename, '..') !== false) {
+            abort(404);
+        }
+        $path = public_path('documents/' . $filename);
+        if (! file_exists($path) || ! is_file($path)) {
+            $path = Storage::disk('local')->path('public/document/' . $filename);
+        }
+        if (! file_exists($path) || ! is_file($path)) {
+            abort(404);
+        }
+        return response()->file($path);
+    }
 
     /**
      * Show the form for creating a new resource.

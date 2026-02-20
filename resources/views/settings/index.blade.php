@@ -72,9 +72,18 @@
                         {{-- <form action="{{route('update_sys_requirement', ['SysRequirement'=>$sr->id])}}"> --}}
                         <div class="col-sm-8">
 {{--                          <label class="form-label" for="sub"> </label>--}}
-                            <p>({{$i}}). {{$sr->name}}</p>
+                            <p class="mb-0">({{$i}}). {{$sr->name}}
+                            @if($sr->type == 'FileUpload')
+                                <span class="text-muted small">(File upload)</span>
+                            @elseif($sr->type == 'YesNoWithEvidence')
+                                <span class="text-muted small">(Yes/No with Evidence if Yes)</span>
+                            @else
+                                <span class="text-muted small">({{$sr->type}})</span>
+                            @endif
+                            </p>
 {{--                          <input disabled class="form-control" type="text" value="" id="sub" >--}}
                         </div>
+
 
 
 
@@ -86,7 +95,7 @@
 
 
 
-                        <div class="col-sm-4">
+                        <div class="col-sm-4 d-flex justify-content-end">
 {{--                          <label class="form-label" for="sub"></label>--}}
                           <a class="nav-link text-default fs-sm fw-normal text-info py-1 pe-0 ps-1 ms-2" type="button" data-bs-toggle="modal" data-bs-target="#edit-user-modal-{{$i}}" onclick="" aria-label="Edit">
                               Edit
@@ -125,13 +134,21 @@
           <div class="mb-3 mb-sm-4">
             <label class="form-label" for="sub">Type</label>
             <select  required class="form-control" name="sys_type" id="sub">
-              <option selected value="{{$sr->type}}">{{$sr->type}}</option>
+              <option selected value="{{$sr->type}}">
+                @if($sr->type == 'FileUpload')
+                File upload
+                @elseif($sr->type == 'YesNoWithEvidence')
+                Yes/No with Evidence if Yes
+                @else{{$sr->type}}
+                @endif</option>
               <option disabled>---Select Type---</option>
               <option value="TextInput">TextInput</option>
               <option value="NumericInput">NumericInput</option>
               <option value="Textarea">Textarea</option>
               <option value="CheckBox">CheckBox</option>
               <option value="Yes/No">Yes/No</option>
+              <option value="FileUpload">File upload</option>
+              <option value="YesNoWithEvidence">Yes/No with Evidence if Yes</option>
             </select>
           </div>
           <button type="submit" class="btn btn-primary w-100">Update</button>
@@ -341,6 +358,8 @@
               <option value="Textarea">Textarea</option>
               <option value="CheckBox">CheckBox</option>
               <option value="Yes/No">Yes/No</option>
+              <option value="FileUpload">File upload</option>
+              <option value="YesNoWithEvidence">Yes/No with Evidence if Yes</option>
             </select>
           </div>
           <button type="submit" class="btn btn-primary w-100">Add</button>

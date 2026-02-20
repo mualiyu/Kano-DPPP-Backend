@@ -790,7 +790,7 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property int $sys_id
-     * @property int $job_id
+     * @property int $tender_id
      * @property string|null $value
      * @property mixed $type
      * @property mixed $name
@@ -802,7 +802,7 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<AppRequirement>|AppRequirement whereName($value)
      * @method static \Illuminate\Database\Eloquent\Builder<AppRequirement>|AppRequirement whereType($value)
      * @method static \Illuminate\Database\Eloquent\Builder<AppRequirement>|AppRequirement whereValue($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<AppRequirement>|AppRequirement whereJobId($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<AppRequirement>|AppRequirement whereTenderId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<AppRequirement>|AppRequirement whereSysId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<AppRequirement>|AppRequirement whereCreatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<AppRequirement>|AppRequirement whereUpdatedAt($value)
@@ -2196,6 +2196,7 @@ namespace App\Models {
      * @property mixed $bid_number
      * @property int $id
      * @property-read \App\Models\Applicant $vendor
+     * @property-read \App\Models\Applicant $applicant
      * @property-read \App\Models\Job $job
      * @property-read \App\Models\Tender $tender
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PurchaseOrder> $purchaseOrders
@@ -5968,11 +5969,11 @@ namespace App\Models {
      * @property mixed $num
      * @property string|null $content
      * @property mixed $heading
-     * @property int $job_id
+     * @property int $tender_id
      * @property int $id
      * @property-read \App\Models\Job $job
      * @method static \Illuminate\Database\Eloquent\Builder<JobContent>|JobContent whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<JobContent>|JobContent whereJobId($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<JobContent>|JobContent whereTenderId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<JobContent>|JobContent whereHeading($value)
      * @method static \Illuminate\Database\Eloquent\Builder<JobContent>|JobContent whereContent($value)
      * @method static \Illuminate\Database\Eloquent\Builder<JobContent>|JobContent whereNum($value)
@@ -6223,11 +6224,11 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property mixed $name
-     * @property int $job_id
+     * @property int $tender_id
      * @property int $id
      * @property-read \App\Models\Job $job
      * @method static \Illuminate\Database\Eloquent\Builder<JobDocument>|JobDocument whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<JobDocument>|JobDocument whereJobId($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<JobDocument>|JobDocument whereTenderId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<JobDocument>|JobDocument whereName($value)
      * @method static \Illuminate\Database\Eloquent\Builder<JobDocument>|JobDocument whereCreatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<JobDocument>|JobDocument whereUpdatedAt($value)
@@ -6479,11 +6480,11 @@ namespace App\Models {
      * @property mixed $due_date
      * @property string|null $content
      * @property mixed $heading
-     * @property int $job_id
+     * @property int $tender_id
      * @property int $id
      * @property-read \App\Models\Job $job
      * @method static \Illuminate\Database\Eloquent\Builder<JobMilestone>|JobMilestone whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<JobMilestone>|JobMilestone whereJobId($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<JobMilestone>|JobMilestone whereTenderId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<JobMilestone>|JobMilestone whereHeading($value)
      * @method static \Illuminate\Database\Eloquent\Builder<JobMilestone>|JobMilestone whereContent($value)
      * @method static \Illuminate\Database\Eloquent\Builder<JobMilestone>|JobMilestone whereDueDate($value)
@@ -6737,11 +6738,11 @@ namespace App\Models {
      * @property mixed $num
      * @property string|null $content
      * @property mixed $heading
-     * @property int $job_id
+     * @property int $tender_id
      * @property int $id
      * @property-read \App\Models\Job $job
      * @method static \Illuminate\Database\Eloquent\Builder<JobReporting>|JobReporting whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<JobReporting>|JobReporting whereJobId($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<JobReporting>|JobReporting whereTenderId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<JobReporting>|JobReporting whereHeading($value)
      * @method static \Illuminate\Database\Eloquent\Builder<JobReporting>|JobReporting whereContent($value)
      * @method static \Illuminate\Database\Eloquent\Builder<JobReporting>|JobReporting whereNum($value)
@@ -6992,12 +6993,12 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property int $sys_id
-     * @property int $job_id
+     * @property int $tender_id
      * @property int $id
      * @property-read \App\Models\Job $job
      * @property-read \App\Models\SysRequirement $sys_requirement
      * @method static \Illuminate\Database\Eloquent\Builder<JobRequirement>|JobRequirement whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<JobRequirement>|JobRequirement whereJobId($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<JobRequirement>|JobRequirement whereTenderId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<JobRequirement>|JobRequirement whereSysId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<JobRequirement>|JobRequirement whereCreatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<JobRequirement>|JobRequirement whereUpdatedAt($value)

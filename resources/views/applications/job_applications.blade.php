@@ -31,41 +31,27 @@
             <?php $a=1;?>
             @if (count($applications) > 0)
                 @foreach ($applications as $app)
-<?php
+@php
+  $applicant = $app->applicant;
   $per = 0;
-  if (!$app->applicant->name == Null) {
-    $per = $per + 11.11;
+  if ($applicant) {
+    if ($applicant->name !== null) { $per += 11.11; }
+    if ($applicant->email !== null) { $per += 11.11; }
+    if ($applicant->phone !== null) { $per += 11.11; }
+    if ($applicant->ownership_type !== null) { $per += 11.11; }
+    if ($applicant->directors !== null) { $per += 11.11; }
+    if ($applicant->vat_number !== null) { $per += 11.11; }
+    if ($applicant->address !== null) { $per += 11.11; }
+    if ($applicant->mobile !== null) { $per += 11.11; }
   }
-  if (!$app->applicant->email == Null) {
-    $per = $per + 11.11;
-  }
-  if (!$app->applicant->phone == Null) {
-    $per = $per + 11.11;
-  }
-  if (!$app->applicant->ownership_type == Null) {
-    $per = $per + 11.11;
-  }
-  if (!$app->applicant->directors == Null) {
-    $per = $per + 11.11;
-  }
-  if (!$app->applicant->vat_number == Null) {
-    $per = $per + 11.11;
-  }
-  if (!$app->applicant->address == Null) {
-    $per = $per + 11.11;
-  }
-  if (!$app->applicant->mobile == Null) {
-    $per = $per + 11.11;
-  }
-
   $per = $per + 11.12;
-  ?>
+@endphp
                 <tr>
                   {{-- <div class="accordion-header"><a class="accordion-button d-flex fs-4 fw-normal text-decoration-none py-3 collapsed" href="#orderOne" data-bs-toggle="collapse" aria-expanded="false" aria-controls="orderOne">
                       <div class="d-flex justify-content-between w-100" style="max-width: 750px;">
                         <div class="me-3 me-sm-3">
                           <div class="fs-sm text-muted mb-2">Company</div>
-                          <div class="fs-sm fw-medium text-dark">{{$app->applicant->name}}</div>
+                          <div class="fs-sm fw-medium text-dark">{{ $app->applicant?->name ?? 'N/A' }}</div>
                         </div>
                         <div class="me-3 me-sm-3">
                           <div class="fs-sm text-muted mb-2">Job Title</div>
@@ -99,8 +85,8 @@
                     </a>
                     </div> --}}
 
-                    <td>{{$app->applicant->name}}</td>
-                            <td>{{$app->job->name}}</td>
+                    <td>{{ $app->applicant?->name ?? 'N/A' }}</td>
+                            <td>{{ $app->job?->name ?? 'N/A' }}</td>
                             <td>
                                 @if ($app->status == 'Successful')
                                     <span class=" badge  fs-xs border bg-primary text-white">{{$app->status}}</span>
@@ -124,7 +110,7 @@
                       <div class="modal-dialog modal-fullscreen" role="document">
                         <div class="modal-content">
                           <div class="modal-header ">
-                            <h4 class="modal-title align-self-start">{{$app->applicant->name}}</h4>
+                            <h4 class="modal-title align-self-start">{{ $app->applicant?->name ?? 'N/A' }}</h4>
 
                             <button class="btn-close align-self-end" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                           </div>
@@ -147,24 +133,26 @@
                                             <!-- Description list alignment -->
                                             <dl class="row">
                                                 <dt class="col-sm-3">Job Name&nbsp;</dt>
-                                                <dd class="col-sm-9 text-bold">{{$app->job->name}}</dd>
+                                                <dd class="col-sm-9 text-bold">{{ $app->job?->name ?? 'N/A' }}</dd>
                                                 <dt class="col-sm-3">Start Date</dt>
-                                                <dd class="col-sm-9">{{date('M d, Y', strtotime($app->job->open_date))}} </dd>
+                                                <dd class="col-sm-9">{{ $app->job?->open_date ? date('M d, Y', strtotime($app->job->open_date)) : 'N/A' }} </dd>
                                                 <dt class="col-sm-3">End Date</dt>
-                                                <dd class="col-sm-9"> {{date('M d, Y', strtotime($app->job->close_date))}}</dd>
+                                                <dd class="col-sm-9"> {{ $app->job?->close_date ? date('M d, Y', strtotime($app->job->close_date)) : 'N/A' }}</dd>
                                                 <dt class="col-sm-3 ">Status</dt>
                                                 <dd class="col-sm-9">
-                                                    @if ($app->job->status == 'Open')
+                                                    @if ($app->job?->status == 'Open')
                                                         <span class="badge  fs-xs border bg-primary text-white">Open</span>
-                                                    @elseif ($app->job->status == 'Draft')
+                                                    @elseif ($app->job?->status == 'Draft')
                                                         <span class="badge  fs-xs border bg-warning text-white">Draft</span>
-                                                    @elseif ($app->job->status == 'Closed')
+                                                    @elseif ($app->job?->status == 'Closed')
                                                         <span class="badge text-nav fs-xs border bg-danger">Closed</span>
+                                                    @else
+                                                        <span class="text-muted">N/A</span>
                                                     @endif
 
                                                   </dd>
                                             </dl>
-                                          @if (count($app->job->job_contents)>0)
+                                          @if ($app->job && count($app->job->job_contents ?? []) > 0)
                                               @foreach ($app->job->job_contents as $jc)
                                               <h4 class="h5" style="font-size: 15px;">
                                                {{$jc->heading}}
@@ -173,7 +161,7 @@
                                               @endforeach
                                           @endif
                                           </div>
-                                          @if (count($app->job->job_milestones)>0)
+                                          @if ($app->job && count($app->job->job_milestones ?? []) > 0)
                                           {{-- <div class="table w-100 mx-4" style="font-size: 15px;"> --}}
                                             <div class="row">
                                               <div class="col-sm-1 h6 mb-2">
@@ -208,7 +196,7 @@
                                             @endforeach
                                             @endif
                                           <div class="pb-4">
-                                              @if (count($app->job->job_reports)>0)
+                                              @if ($app->job && count($app->job->job_reports ?? []) > 0)
                                                   @foreach ($app->job->job_reports as $r)
                                                       <h3 class="h4 card-title pt-5" style="font-size: 15px;">
                                                           {{$r->heading}}
@@ -221,7 +209,7 @@
                                             <br>
                                           <hr>
 
-                                          @if (count($app->job->job_requirements)>0)
+                                          @if ($app->job && count($app->job->job_requirements ?? []) > 0)
                                           <div class="row pt-5">
                                             <div class="col-12 mb-3">
                                                <div class="d-none text-dark d-sm-block fs-lg mb-2 display-3">Application Requirements</div>
@@ -240,7 +228,7 @@
                                           </div>
                                           @endif
                                           <div class="row">
-                                              @if ($app->job->job_docs)
+                                              @if ($app->job?->job_docs && count($app->job->job_docs) > 0)
                                                   <div class="">
                                                       <div class="d-none d-sm-block fs-sm mb-2 display-3">Documents</div>
                                                       <ul class="">
@@ -262,13 +250,13 @@
                                                 <div class="col-12">
                                                     <dl class="row">
                                                         <dt class="col-sm-3 text-muted">Company Name:&nbsp;</dt>
-                                                        <dd class="col-sm-9 text-dark">{{$app->applicant->name}}</dd>
+                                                        <dd class="col-sm-9 text-dark">{{ $app->applicant?->name ?? 'N/A' }}</dd>
                                                         <dt class="col-sm-3 text-muted">Submission Date:</dt>
                                                         <dd class="col-sm-9 text-dark " >{{date('M d, Y - h:ma', strtotime($app->created_at))}} </dd>
                                                         <dt class="col-sm-3 text-muted">Email:</dt>
-                                                        <dd class="col-sm-9 text-dark">{{$app->applicant->email}} </dd>
+                                                        <dd class="col-sm-9 text-dark">{{ $app->applicant?->email ?? 'N/A' }} </dd>
                                                         <dt class="col-sm-3 text-muted">Phone:</dt>
-                                                        <dd class="col-sm-9 text-dark"> {{$app->applicant->phone ?? "Not Available"}}</dd>
+                                                        <dd class="col-sm-9 text-dark"> {{ $app->applicant?->phone ?? 'Not Available' }}</dd>
                                                     </dl>
                                                 </div>
                                             </div>
@@ -278,7 +266,7 @@
                                                     <dl class="row pt-5">
                                                         <dt class="col-sm-3 text-muted">Directors:&nbsp;</dt>
                                                         <dd class="col-sm-9 text-dark">
-                                                          @if (count($app->applicant->directors)>0)
+                                                          @if ($app->applicant && count($app->applicant->directors ?? []) > 0)
                                                                 @foreach ($app->applicant->directors as $d)
                                                                     <p class="mb-2">{{$d->name}}</p>
                                                                 @endforeach
@@ -288,7 +276,7 @@
                                                         </dd>
                                                         <dt class="col-sm-3 text-muted">Previous Jobs:</dt>
                                                         <dd class="col-sm-9 text-dark " >
-                                                          @if (count($app->applicant->experiences)>0)
+                                                          @if ($app->applicant && count($app->applicant->experiences ?? []) > 0)
                                                                 @foreach ($app->applicant->experiences as $e)
                                                                     <dl class="row">
                                                                         <dd class="col-sm-4">{{$e->name}}</dd>
@@ -300,7 +288,7 @@
                                                         </dd>
 
                                                         <dt class="col-sm-3 text-muted">Ownership Type:</dt>
-                                                        <dd class="col-sm-9 text-dark">{{$app->applicant->ownership_type}}</dd>
+                                                        <dd class="col-sm-9 text-dark">{{ $app->applicant?->ownership_type ?? 'N/A' }}</dd>
                                                     </dl>
 
                                                 </div>
@@ -313,21 +301,20 @@
                                           <div class="row pt-4">
                                               @if (count($app->app_requirements)>0)
                                               <div class="col-12" >
-                                              <div class="fs-lg mb-3 text-dark">Applicant Submission:</div>
+                                              <h5 class="mb-3 text-dark">Bid details submitted by applicant</h5>
                                               </div>
                                               @foreach ($app->app_requirements as $ar)
                                                 <div class="col-sm-12 d-sm-block">
                                                     <div class="mb-3">
-                                                      <label for="file-input" class="form-label">{{$ar->name}}: </label>
+                                                      <label for="file-input" class="form-label fw-medium">{{ $ar->name }}:</label>
                                                       @if ($ar->type == "TextInput")
-                                                      <input class="form-control" disabled type="text" value="{{$ar->value}}">
+                                                      <input class="form-control" disabled type="text" value="{{ $ar->value ?? '' }}">
                                                       @elseif($ar->type == "NumericInput")
-                                                      <input disabled class="form-control"  type="number" value="{{$ar->value}}">
+                                                      <input disabled class="form-control" type="text" value="{{ $ar->value !== null && $ar->value !== '' && is_numeric($ar->value) ? number_format((float)$ar->value, 2) : ($ar->value ?? '') }}">
                                                       @elseif($ar->type == "CheckBox")
-                                                      <input disabled {{$ar->value == null ? "":"checked"}} type="checkbox">
-                                                       @elseif($ar->type == "Yes/No")
-
-                                                        @if ($ar->value == 1)
+                                                      <input disabled {{ ($ar->value != null && $ar->value != '') ? 'checked' : '' }} type="checkbox">
+                                                      @elseif($ar->type == "Yes/No")
+                                                        @if ($ar->value == 1 || $ar->value === '1')
                                                         <br>
                                                           <label for="y">Yes: </label>
                                                           <input disabled checked type="radio">
@@ -342,9 +329,42 @@
                                                           <label for="n">No: </label>
                                                           <input disabled checked type="radio">
                                                         @endif
-
                                                       @elseif($ar->type == "Textarea")
-                                                      <textarea class="form-control" rows="10" disabled>{{$ar->value}}</textarea>
+                                                      <textarea class="form-control" rows="4" disabled>{{ $ar->value ?? '' }}</textarea>
+                                                      @elseif($ar->type == "FileUpload")
+                                                        @if(!empty($ar->value))
+                                                        <p class="mb-1 text-muted">{{ $ar->value }}</p>
+                                                        @if(Route::has('admin_view_requirement_file') || Route::has('admin_download_requirement_file'))
+                                                        <span class="d-inline-flex gap-1">
+                                                            @if(Route::has('admin_view_requirement_file'))<a href="{{ route('admin_view_requirement_file', ['filename' => $ar->value]) }}" target="_blank" class="btn btn-sm btn-outline-secondary">View</a>@endif
+                                                            @if(Route::has('admin_download_requirement_file'))<a href="{{ route('admin_download_requirement_file', ['filename' => $ar->value]) }}" class="btn btn-sm btn-outline-primary">Download</a>@endif
+                                                        </span>
+                                                        @endif
+                                                        @else
+                                                        <p class="mb-0 text-muted">—</p>
+                                                        @endif
+                                                      @elseif($ar->type == "YesNoWithEvidence")
+                                                        @php
+                                                            $ynValue = $ar->value;
+                                                            $isYes = ($ynValue == 1 || $ynValue === '1' || (is_string($ynValue) && strpos($ynValue, '1') === 0));
+                                                            $evidenceFile = (is_string($ynValue) && strpos($ynValue, '|') !== false) ? (explode('|', $ynValue)[1] ?? null) : null;
+                                                        @endphp
+                                                        @if($isYes)
+                                                        <span class="me-2">Yes</span>
+                                                        @if($evidenceFile)
+                                                        <span class="text-muted">{{ $evidenceFile }}</span>
+                                                        @if(Route::has('admin_view_requirement_file') || Route::has('admin_download_requirement_file'))
+                                                        <span class="ms-1 d-inline-flex gap-1">
+                                                            @if(Route::has('admin_view_requirement_file'))<a href="{{ route('admin_view_requirement_file', ['filename' => $evidenceFile]) }}" target="_blank" class="btn btn-sm btn-outline-secondary">View</a>@endif
+                                                            @if(Route::has('admin_download_requirement_file'))<a href="{{ route('admin_download_requirement_file', ['filename' => $evidenceFile]) }}" class="btn btn-sm btn-outline-primary">Download</a>@endif
+                                                        </span>
+                                                        @endif
+                                                        @endif
+                                                        @else
+                                                        <span>No</span>
+                                                        @endif
+                                                      @else
+                                                      <input class="form-control" disabled type="text" value="{{ $ar->value ?? '—' }}">
                                                       @endif
                                                     </div>
                                                 </div>

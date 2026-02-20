@@ -150,7 +150,7 @@ class DatabaseController extends Controller
         if (count($applicant)>0) {
             $applicant =$applicant[0];
 
-            $bids = Bid::where(['vendor_id'=>$id])->get();
+            $bids = Bid::with(['job', 'app_requirements', 'application_documents', 'experiences', 'vendor'])->where('vendor_id', $id)->get();
 
             return view('database.applicant_application', compact("applicant", "bids"));
         }else{

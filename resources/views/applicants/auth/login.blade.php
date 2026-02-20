@@ -12,7 +12,7 @@
           
           @include('layouts.flash')
           <div class="w-100 mt-auto pt-5" style="max-width: 526px;">
-              <img src="{{ asset('assets/img/images/kano-logo.png') }}" width="72" alt="Kano State Government">
+              <img src="{{ asset('assets/img/images/kano-logo.png') }}" width="96" height="96" alt="Kano State Government" class="mb-2">
             <h3 class="pt-4 text-primary">Kano State E-Procurement Vendor Login</h3>
             <p class="pb-3 mb-3 mb-lg-4 text-dark">
             Sign in below or <a href='{{route('app_show_register')}}'>register</a> to submit bids for available tenders.</p>
@@ -57,7 +57,7 @@
           </div>
         </div>
         <!-- Cover image-->
-        <div class="w-50 bg-size-cover bg-repeat-0 bg-position-center" style="background-image: url({{asset('assets/img/images/kano-applicant-cover.png')}});"></div>
+        <div class="w-50 bg-size-cover bg-repeat-0 bg-position-center overflow-hidden rounded-4 rounded-start-0" style="background-image: url({{asset('assets/img/images/kano-applicant-cover.png')}});"></div>
       </div>
     </main>
 @endsection

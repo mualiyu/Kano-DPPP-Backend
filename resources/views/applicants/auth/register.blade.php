@@ -10,7 +10,7 @@
         <div class="d-flex flex-column align-items-center w-lg-50 h-100 px-3 px-lg-5 pt-5">
 
           <div class="w-100 mt-auto" style="max-width: 526px;">
-              <img src="{{ asset('assets/img/images/kano-logo.png') }}" width="72" alt="Kano State Government">
+              <img src="{{ asset('assets/img/images/kano-logo.png') }}" width="96" height="96" alt="Kano State Government" class="mb-2">
             <h3 class="pt-4 text-primary">Register as a Vendor</h3>
             <p class="pb-2 mb-1 mb-lg-4">Already registered?&nbsp;&nbsp;<a href='{{route('app_show_login')}}'>Sign in here</a>.</p>
             @include('layouts.flash')
@@ -111,8 +111,8 @@
 
           </div>
         </div>
-        <!-- Cover image-->
-        <div class="w-50 bg-size-cover bg-repeat-0 bg-position-center" style="background-image: url({{asset('assets/img/images/login.png')}});"></div>
+        <!-- Cover image (same as applicant login)-->
+        <div class="w-50 bg-size-cover bg-repeat-0 bg-position-center overflow-hidden rounded-4 rounded-start-0" style="background-image: url({{asset('assets/img/images/kano-applicant-cover.png')}});"></div>
       </div>
     </main>
 @endsection

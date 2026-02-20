@@ -68,14 +68,16 @@
 
                         <td>{{$tender->name}}</td>
                         <td>
-                            @if ($tender->status == 'open')
-                                <span class="badge  fs-xs border bg-primary text-white">Open</span>
-                            @elseif ($tender->status == 'draft')
-                                <span class="badge  fs-xs border bg-warning text-white">Draft</span>
-                            @elseif ($tender->status == 'closed')
+                            @if (strtolower($tender->status ?? '') == 'open')
+                                <span class="badge fs-xs border bg-primary text-white">Open</span>
+                            @elseif (strtolower($tender->status ?? '') == 'draft')
+                                <span class="badge fs-xs border bg-warning text-white">Draft</span>
+                            @elseif (strtolower($tender->status ?? '') == 'closed')
                                 <span class="badge text-nav fs-xs border bg-danger">Closed</span>
-                            @elseif ($tender->status == 'awarded')
+                            @elseif (strtolower($tender->status ?? '') == 'awarded')
                                 <span class="badge text-nav fs-xs border bg-success">Awarded</span>
+                            @else
+                                <span class="badge fs-xs border bg-secondary text-dark">{{ $tender->status ?? '—' }}</span>
                             @endif
                         </td>
                         <td>{{$tender->opening_date ? date('M d, Y', strtotime($tender->opening_date)) : 'N/A'}}</td>

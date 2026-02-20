@@ -50,7 +50,7 @@
                     <div class="col-sm-6">
                       <label class="form-label" for="estimated_value">Estimated Value</label>
                       <div class="input-group">
-                        <input class="form-control" type="number" name="estimated_value" id="estimated_value" step="0.01" min="0" value="{{$job->estimated_value ?? ''}}" placeholder="0.00">
+                        <input class="form-control js-currency-input" type="text" name="estimated_value" id="estimated_value" value="{{ isset($job->estimated_value) ? number_format($job->estimated_value, 2) : '' }}" placeholder="0.00" data-decimals="2" inputmode="decimal">
                         <select class="form-control" name="currency" id="currency" style="max-width: 80px;">
                             <option value="NGN" {{($job->currency ?? 'NGN') == 'NGN' ? 'selected' : ''}}>NGN</option>
                             <option value="USD" {{$job->currency == 'USD' ? 'selected' : ''}}>USD</option>
@@ -113,11 +113,11 @@
                     </div> --}}
                     <div class="col-sm-6">
                       <label class="form-label" for="open_date">Open Date</label>
-                      <input class="form-control" type="date" value="{{$job->open_date}}" id="open_date" name="open_date">
+                      <input class="form-control" type="date" value="{{ $job->open_date ?? $job->opening_date }}" id="open_date" name="open_date">
                     </div>
                     <div class="col-sm-6">
-                      <label class="form-label" for="close_date">close Date</label>
-                      <input class="form-control" type="date" value="{{$job->close_date}}" id="close_date" name="close_date">
+                      <label class="form-label" for="close_date">Close Date</label>
+                      <input class="form-control" type="date" value="{{ $job->close_date ?? $job->closing_date }}" id="close_date" name="close_date">
                     </div>
                     @if ($job->tor)
                     <div class="col-sm-6">
@@ -134,15 +134,6 @@
                     </div>
 
                     <div class="col-sm-6">
-                      <label class="form-label" for="opening_date">Opening Date</label>
-                      <input class="form-control" type="date" value="{{$job->opening_date ?? ''}}" id="opening_date" name="opening_date">
-                    </div>
-                    <div class="col-sm-6">
-                      <label class="form-label" for="closing_date">Closing Date</label>
-                      <input class="form-control" type="date" value="{{$job->closing_date ?? ''}}" id="closing_date" name="closing_date">
-                    </div>
-
-                    <div class="col-sm-6">
                       <label class="form-label" for="evaluation_start_date">Evaluation Start Date</label>
                       <input class="form-control" type="date" value="{{$job->evaluation_start_date ?? ''}}" id="evaluation_start_date" name="evaluation_start_date">
                     </div>
@@ -153,17 +144,17 @@
 
                     <div class="col-sm-6">
                       <label class="form-label" for="bid_security_amount">Bid Security Amount</label>
-                      <input class="form-control" type="number" name="bid_security_amount" id="bid_security_amount" step="0.01" min="0" value="{{$job->bid_security_amount ?? ''}}" placeholder="0.00">
+                      <input class="form-control js-currency-input" type="text" name="bid_security_amount" id="bid_security_amount" value="{{ isset($job->bid_security_amount) ? number_format($job->bid_security_amount, 2) : '' }}" placeholder="0.00" data-decimals="2" inputmode="decimal">
                     </div>
 
                     <div class="col-sm-6">
                       <label class="form-label" for="performance_security_amount">Performance Security Amount</label>
-                      <input class="form-control" type="number" name="performance_security_amount" id="performance_security_amount" step="0.01" min="0" value="{{$job->performance_security_amount ?? ''}}" placeholder="0.00">
+                      <input class="form-control js-currency-input" type="text" name="performance_security_amount" id="performance_security_amount" value="{{ isset($job->performance_security_amount) ? number_format($job->performance_security_amount, 2) : '' }}" placeholder="0.00" data-decimals="2" inputmode="decimal">
                     </div>
 
                     <div class="col-sm-6">
                       <label class="form-label" for="contract_duration_days">Contract Duration (Days)</label>
-                      <input class="form-control" type="number" name="contract_duration_days" id="contract_duration_days" min="0" value="{{$job->contract_duration_days ?? ''}}" placeholder="0">
+                      <input class="form-control js-currency-input" type="text" name="contract_duration_days" id="contract_duration_days" value="{{ isset($job->contract_duration_days) ? number_format($job->contract_duration_days, 0) : '' }}" placeholder="0" data-decimals="0" inputmode="numeric">
                     </div>
 
                     <div class="col-sm-12">
@@ -251,12 +242,12 @@
                       @endforeach
                     </div>
                     {{-- End report section --}}
-                    <hr>
-                    <div class="col-12">
+                    <hr class="d-none">
+                    <div class="col-12 d-none">
                       <h6 class="mb-0" style="float: left">Documents Required</h6>
                       <span class="btn btn-primary" style="float: right;" onclick="doctt()">Add</span>
                     </div>
-                    <div class="row docc">
+                    <div class="row docc d-none">
                       <?php $jdr=1;?>
                       @foreach ($job->job_docs as $jd)
                       <div class="col-sm-6">
@@ -273,14 +264,6 @@
                       </div>
                       <?php $jdr++;?>
                       @endforeach
-                    </div>
-
-
-                    <div class="col-12 mb-3">
-                      <h6 class="mb-0" >Require Previous Experience: <input  type="checkbox" name="p_e_r" {{$job->p_e_r==1 ? "checked":""}} value="1" /></h6>
-                    </div>
-                    <div class="col-12 mb-3">
-                      <h6 class="mb-0" >Require Educational Background: <input  type="checkbox" name="e_b" {{$job->e_b==1 ? "checked":""}} value="1" /></h6>
                     </div>
 
                     {{-- job requirements --}}

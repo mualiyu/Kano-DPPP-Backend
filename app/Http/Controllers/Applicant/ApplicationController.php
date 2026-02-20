@@ -38,14 +38,52 @@ class ApplicationController extends Controller
     {
         $applicant = session('Applicant');
 
-        $app = Bid::where(['id'=>$id])->get();
+        $app = Bid::with(['app_requirements', 'job', 'experiences', 'educations', 'application_documents', 'comments'])->where(['id'=>$id])->first();
 
-        if (count($app)>0) {
-            $app = $app[0];
+        if ($app) {
             return view('applicants.applications.info', compact("applicant", "app"));
         }else{
             abort(404);
         }
+    }
+
+    /**
+     * Download a file uploaded as part of an application requirement (stored in public/documents).
+     */
+    public function download_requirement_file($filename)
+    {
+        $filename = basename(urldecode($filename));
+        if ($filename === '' || strpos($filename, '..') !== false) {
+            abort(404);
+        }
+        // Try public/documents first, then storage (for backwards compatibility)
+        $path = public_path('documents/' . $filename);
+        if (! file_exists($path) || ! is_file($path)) {
+            $path = Storage::disk('local')->path('public/document/' . $filename);
+        }
+        if (! file_exists($path) || ! is_file($path)) {
+            abort(404);
+        }
+        return response()->download($path, $filename, ['Content-Type' => 'application/pdf']);
+    }
+
+    /**
+     * View a requirement file in the browser (e.g. PDF in new tab).
+     */
+    public function view_requirement_file($filename)
+    {
+        $filename = basename(urldecode($filename));
+        if ($filename === '' || strpos($filename, '..') !== false) {
+            abort(404);
+        }
+        $path = public_path('documents/' . $filename);
+        if (! file_exists($path) || ! is_file($path)) {
+            $path = Storage::disk('local')->path('public/document/' . $filename);
+        }
+        if (! file_exists($path) || ! is_file($path)) {
+            abort(404);
+        }
+        return response()->file($path);
     }
 
     public function download_doc($id)

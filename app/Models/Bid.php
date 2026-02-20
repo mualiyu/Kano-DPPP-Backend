@@ -51,6 +51,14 @@ class Bid extends Model
     }
 
     /**
+     * Alias for vendor() for views that expect "applicant"
+     */
+    public function applicant(): BelongsTo
+    {
+        return $this->belongsTo(Applicant::class, 'vendor_id');
+    }
+
+    /**
      * Legacy accessor for job (tender) from original system.
      * Allows using $bid->job where Job model now maps to tenders table.
      */

@@ -253,6 +253,7 @@
     <script src="{{asset('assets/vendor/smooth-scroll/dist/smooth-scroll.polyfills.min.js')}}"></script>
     <!-- Main theme script-->
     <script src="{{asset('assets/js/theme.min.js')}}"></script>
+    <script src="{{asset('assets/js/currency-format.js')}}"></script>
 
     @yield('script')
   </body>
